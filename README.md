@@ -29,10 +29,10 @@ chmod +x auto_deploy.sh
 🎉 **And that's it!** The bot is now running in the background and will start automatically when your server reboots.
 
 ### Useful Commands (for auto-deployed bot)
-- **Check Status:** `systemctl --user status ai-bot`
-- **View Logs:** `journalctl --user -u ai-bot -f`
-- **Restart the Bot:** `systemctl --user restart ai-bot`
-- **Stop the Bot:** `systemctl --user stop ai-bot`
+- **Check Status:** `sudo systemctl status ai-bot`
+- **View Logs:** `sudo journalctl -u ai-bot -f`
+- **Restart the Bot:** `sudo systemctl restart ai-bot`
+- **Stop the Bot:** `sudo systemctl stop ai-bot`
 
 ---
 

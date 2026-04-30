@@ -45,20 +45,27 @@ pip install --upgrade pip
 pip install -r requirements.txt
 echo -e "${GREEN}Залежності Python встановлено!${NC}"
 
-# 4. Створення systemd сервісу (user-level)
+# 4. Створення systemd сервісу (system-wide)
 echo -e "\n${BLUE}[4/4] Створення systemd сервісу для фонової роботи...${NC}"
 
-mkdir -p ~/.config/systemd/user
 WORK_DIR=$(pwd)
+CURRENT_USER=$USER
+if [ "$CURRENT_USER" = "root" ]; then
+    # Намагаємось знайти реального користувача, якщо скрипт запущено через sudo
+    if [ -n "$SUDO_USER" ]; then
+        CURRENT_USER=$SUDO_USER
+    fi
+fi
 
 # Сервіс AI-бота
-cat > ~/.config/systemd/user/ai-bot.service <<EOL
+$SUDO bash -c "cat > /etc/systemd/system/ai-bot.service" <<EOL
 [Unit]
 Description=Telegram AI Assistant Bot
 After=network.target
 
 [Service]
 Type=simple
+User=${CURRENT_USER}
 WorkingDirectory=${WORK_DIR}
 ExecStart=${WORK_DIR}/venv/bin/python3 bot.py
 Restart=always
@@ -66,19 +73,16 @@ RestartSec=5
 Environment="PATH=${WORK_DIR}/venv/bin:%E/PATH"
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target
 EOL
 
-systemctl --user daemon-reload
-systemctl --user enable --now ai-bot.service
-
-# Дозволити сервісам користувача працювати навіть після виходу з ssh
-loginctl enable-linger $USER
+$SUDO systemctl daemon-reload
+$SUDO systemctl enable --now ai-bot.service
 
 echo -e "\n${GREEN}======================================================================${NC}"
 echo -e "${GREEN}ГОТОВО! Ваш AI-Bot успішно встановлений та запущений у фоні.${NC}"
 echo -e "======================================================================"
 echo -e "🔄 Бот автоматично запуститься після перезавантаження сервера."
 echo -e ""
-echo -e "📋 Перевірити статус бота:        ${BLUE}systemctl --user status ai-bot${NC}"
-echo -e "📋 Подивитись логи бота:          ${BLUE}journalctl --user -u ai-bot -f${NC}"
+echo -e "📋 Перевірити статус бота:        ${BLUE}sudo systemctl status ai-bot${NC}"
+echo -e "📋 Подивитись логи бота:          ${BLUE}sudo journalctl -u ai-bot -f${NC}"
