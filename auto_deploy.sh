@@ -18,7 +18,7 @@ if [ ! -f .env ]; then
     cat > .env <<EOL
 BOT_TOKEN=${bot_token}
 NVIDIA_API_KEY=${nvidia_key}
-MODEL_NAME=meta/llama-3.1-70b-instruct
+MODEL_NAME=google/gemma-3-27b-it
 ALLOWED_USER_IDS=${user_ids}
 EOL
     echo -e "${GREEN}Файл .env створено!${NC}"
