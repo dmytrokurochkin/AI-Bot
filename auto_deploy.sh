@@ -57,6 +57,10 @@ if [ "$CURRENT_USER" = "root" ]; then
     fi
 fi
 
+# Зупиняємо старий сервіс, якщо він існує (щоб чисто оновити)
+echo -e "${BLUE}Оновлення конфігурації сервісу...${NC}"
+$SUDO systemctl stop ai-bot.service 2>/dev/null || true
+
 # Сервіс AI-бота
 $SUDO bash -c "cat > /etc/systemd/system/ai-bot.service" <<EOL
 [Unit]
@@ -77,7 +81,8 @@ WantedBy=multi-user.target
 EOL
 
 $SUDO systemctl daemon-reload
-$SUDO systemctl enable --now ai-bot.service
+$SUDO systemctl enable ai-bot.service
+$SUDO systemctl restart ai-bot.service
 
 echo -e "\n${GREEN}======================================================================${NC}"
 echo -e "${GREEN}ГОТОВО! Ваш AI-Bot успішно встановлений та запущений у фоні.${NC}"
